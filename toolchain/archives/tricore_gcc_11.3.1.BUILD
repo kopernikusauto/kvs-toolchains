@@ -49,9 +49,9 @@ TOOLS = [
 filegroup(
     name = "include_path",
     srcs = [
-        "{}/include".format(PREFIX),
         "lib/gcc/{}/{}/include".format(PREFIX, VERSION),
         "lib/gcc/{}/{}/include-fixed".format(PREFIX, VERSION),
+        "{}/include".format(PREFIX),
         "{}/include/c++/{}".format(PREFIX, VERSION),
         "{}/include/c++/{}/{}".format(PREFIX, VERSION, PREFIX),
     ],

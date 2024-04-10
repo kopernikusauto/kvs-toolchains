@@ -49,7 +49,6 @@ def _default_compiler_flags(ctx):
         compiler_flags.append("-nostdinc")
         if ctx.attr.gcc_tool == "g++":
             compiler_flags.append(
-                "-nostdinc++",
                 "-std=c++20",
                 "-Wno-register",
                 "-Wno-deprecated-enum-enum-conversion",
@@ -126,7 +125,7 @@ def _impl(ctx):
                     ACTION_NAMES.clif_match,
                 ],
                 flag_groups = [
-                    flag_group(flags = ["-isystem" + include.path for include in ctx.files.include_path]),
+                    flag_group(flags = ["-isystem " + include.path for include in ctx.files.include_path]),
                     flag_group(flags = ctx.attr.copts + default_compiler_flags),
                 ],
             ),

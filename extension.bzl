@@ -18,7 +18,8 @@ def _tricore_gcc_archives_impl(ctx):
     http_archive(
         name = "tricore_gcc_linux_x86_64",
         strip_prefix = "tricore-elf",
-        url = _cloudsmith_url(token, "tricore-gcc_linux-x86_64/versions/11.3.1/tricore-elf-gcc-11.3.1.tar.xz"),
+        #url = _cloudsmith_url(token, "tricore-gcc_linux-x86_64/versions/11.3.1/tricore-elf-gcc-11.3.1.tar.xz"),
+        url = "https://github.com/kopernikusauto/kvs-toolchains/releases/download/2024.01.25/tricore-elf-gcc-11.3.1.tar.xz",
         sha256 = "de02d8befcbac36f3bc9f1b06ec0e2059b3b2d6411b2259152cac05eb5d4267c",
         build_file = "@kvs_toolchains//toolchain/archives:tricore_gcc_11.3.1.BUILD",
     )

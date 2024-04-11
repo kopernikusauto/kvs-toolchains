@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------
+#  Copyright (C) 2024 Kopernikus Automotive GmbH - All Rights Reserved
+# ------------------------------------------------------------------------------
+
 """
 """
 
@@ -105,6 +109,12 @@ def _impl(ctx):
         ctx,
         [ACTION_NAMES.strip],
         "strip",
+    )
+
+    action_configs += _action_configs(
+        ctx,
+        [ACTION_NAMES.objcopy_embed_data],
+        "objcopy",
     )
 
     toolchain_compiler_flags = feature(

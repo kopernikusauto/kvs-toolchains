@@ -46,7 +46,7 @@ def _gen_hex_impl(ctx):
     )
 
     return [
-        DefaultInfo(files = depset([output_file])),
+        DefaultInfo(files = depset([output_file, elf_src])),
     ]
 
 _gen_hex = rule(

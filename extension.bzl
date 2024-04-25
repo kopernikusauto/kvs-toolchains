@@ -29,7 +29,7 @@ def _tricore_gcc_archives_impl(ctx):
         strip_prefix = "tricore-gcc",
         url = _cloudsmith_url(token, "tricore-gcc_windows-x86_64/versions/11.3.1/tricore-elf-gcc-11.3.1-windows.tar.xz"),
         sha256 = "ce11520e9ad0caebaab74f5bf85dbcd524c7203df8c319df249610809f9b4f83",
-        build_file = "@kvs_toolchains//toolchain/archives:tricore_gcc_11.3.1.BUILD",
+        build_file = "@kvs_toolchains//toolchain/archives:tricore_gcc_11.3.1_windows.BUILD",
     )
 
     http_archive(

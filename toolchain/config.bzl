@@ -9,7 +9,7 @@ load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@rules_cc//cc:cc_toolchain_config_lib.bzl", "action_config", "feature", "flag_group", "flag_set")
 
 def _tool_path(bins, toolchain_prefix, tool_name):
-    """Generate tool paths for GCC"""
+    """Generate tool paths"""
     for file in bins:
         if file.basename.startswith("{}-{}".format(toolchain_prefix, tool_name)):
             return file
@@ -38,8 +38,19 @@ def _default_compiler_flags(ctx):
         "-no-canonical-prefixes",
         "-Wall",
         "-Wextra",
-        "-Wshadow",
+        "-Wpedantic",
+        "-Wno-error=deprecated",
         "-fdiagnostics-color=auto",
+    ]
+
+    if not ctx.attr.include_std:
+        compiler_flags.append("-nostdinc")
+
+    return compiler_flags
+
+def _default_tricore_compiler_flags(ctx):
+    """Default compiler flags for GCC bazel toolchains"""
+    compiler_flags = [
         "-fmessage-length=0",
         "-fno-common",
         "-fstrict-volatile-bitfields",
@@ -49,31 +60,21 @@ def _default_compiler_flags(ctx):
         "-mtc162",  # TODO: We need to generalize this if we want to support more than the tc377tx!
     ]
 
-    if not ctx.attr.include_std:
-        compiler_flags.append("-nostdinc")
-        if ctx.attr.gcc_tool == "g++":
-            compiler_flags.append(
-                "-std=c++20",
-                "-Wno-register",
-                "-Wno-deprecated-enum-enum-conversion",
-                "-fno-rtti",
-            )
-        if ctx.attr.gcc_tool == "gcc":
-            compiler_flags.append("-std=c17")
+    return _default_compiler_flags(ctx) + compiler_flags
 
-    return compiler_flags
-
-def _default_linker_flags(_ctx):
+def _default_tricore_linker_flags(_ctx):
     """Default linker flags for GCC bazel toolchains"""
-    return [
+    linker_flags = [
         "-no-canonical-prefixes",
         "-Wl,--gc-sections",
         "-mtc162",  # TODO: We need to generalize this if we want to support more than the tc377tx!
     ]
 
-def _impl(ctx):
-    default_compiler_flags = _default_compiler_flags(ctx)
-    default_linker_flags = _default_linker_flags(ctx)
+    return linker_flags
+
+def _tricore_gcc_impl(ctx):
+    default_compiler_flags = _default_tricore_compiler_flags(ctx)
+    default_linker_flags = _default_tricore_linker_flags(ctx)
     action_configs = []
 
     action_configs += _action_configs(
@@ -135,8 +136,32 @@ def _impl(ctx):
                     ACTION_NAMES.clif_match,
                 ],
                 flag_groups = [
-                    flag_group(flags = ["-isystem " + include.path for include in ctx.files.include_path]),
+                    flag_group(flags = ["-isystem {}".format(include.path) for include in ctx.files.include_path]),
                     flag_group(flags = ctx.attr.copts + default_compiler_flags),
+                ],
+            ),
+            flag_set(
+                actions = [
+                    ACTION_NAMES.c_compile,
+                ],
+                flag_groups = [
+                    flag_group(flags = ["-std=c17"]),
+                ],
+            ),
+            flag_set(
+                actions = [
+                    ACTION_NAMES.cpp_compile,
+                    ACTION_NAMES.cpp_header_parsing,
+                    ACTION_NAMES.cpp_module_compile,
+                    ACTION_NAMES.cpp_module_codegen,
+                ],
+                flag_groups = [
+                    flag_group(flags = [
+                        "-std=c++20",
+                        "-Wno-register",
+                        "-Wno-deprecated-enum-enum-conversion",
+                        "-fno-rtti",
+                    ]),
                 ],
             ),
         ],
@@ -187,7 +212,7 @@ def _impl(ctx):
     )
 
 cc_tricore_gcc_toolchain_config = rule(
-    implementation = _impl,
+    implementation = _tricore_gcc_impl,
     attrs = {
         "toolchain_identifier": attr.string(default = "tricore_gcc"),
         "toolchain_prefix": attr.string(default = "tricore-elf"),

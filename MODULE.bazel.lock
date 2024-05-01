@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "917971170f0942bc645fcdc8a3d8c36cfd00d643f288814c8b9331de8c4b9a71",
+  "moduleFileHash": "329c97c12f16bbed736d3dfc536d5ff32e2e7b1806df1678f10276cd2f979eb8",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -18,7 +18,7 @@
   "moduleDepGraph": {
     "<root>": {
       "name": "kvs_toolchains",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "key": "<root>",
       "repoName": "kvs_toolchains",
       "executionPlatformsToRegister": [],

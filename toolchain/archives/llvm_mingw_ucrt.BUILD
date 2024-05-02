@@ -2,7 +2,7 @@
 This BUILD file is used to provide the content of a tricore_gcc archive
 """
 
-load("@kvs_toolchains//toolchain:config.bzl", "cc_llvm_mingw_toolchain_config")
+load("@kvs_toolchains//toolchain/config:llvm_mingw.bzl", "cc_llvm_mingw_toolchain_config")
 load("@rules_cc//cc:defs.bzl", "cc_toolchain")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,16 +15,11 @@ exports_files(glob(
 
 PREFIX = "x86_64-w64-mingw32"
 
-VERSION = "18.1.4"
-
 TOOLS = [
     "as",
-    "llvm-ar",
     "c++",
     "clang++",
     "clang",
-    "llvm-cov",
-    "llvm-dlltool",
     "nm",
     "objcopy",
     "readelf",
@@ -69,6 +64,8 @@ TOOLS = [
         "llvm-symbolizer",
         "llvm-windres",
         "llvm-wrapper",
+        "clang-format",
+        "clang-tidy",
     ]
 ]
 
@@ -85,9 +82,7 @@ filegroup(
 filegroup(
     name = "library_path",
     srcs = [
-        "lib",
         "{}/lib".format(PREFIX),
-        "{}/mingw/lib".format(PREFIX),
         "lib/clang/18/lib/windows",
     ],
 )
@@ -99,36 +94,10 @@ filegroup(
 
 # libraries, headers and executables.
 filegroup(
-    name = "compiler_pieces",
+    name = "toolchain_bins",
     srcs = glob([
         "bin/**",
-        "{}/**".format(PREFIX),
-        "lib/**",
-        "include/**",
-        "python/**",
     ]),
-)
-
-# files for executing compiler.
-filegroup(
-    name = "compiler_files",
-    srcs = [":compiler_pieces"],
-)
-
-filegroup(
-    name = "ar_files",
-    srcs = [":compiler_pieces"],
-)
-
-filegroup(
-    name = "linker_files",
-    srcs = [":compiler_pieces"],
-)
-
-# collection of executables.
-filegroup(
-    name = "compiler_components",
-    srcs = [":compiler_pieces"],
 )
 
 cc_toolchain(
@@ -147,17 +116,8 @@ cc_toolchain(
 
 cc_llvm_mingw_toolchain_config(
     name = "cc_toolchain_config",
-    abi_version = "",
-    copts = [],
-    gcc_tool = "clang",
-    host_system_name = "windows_x86_64",
     include_path = [":include_path"],
-    include_std = True,
     library_path = [":library_path"],
-    linkopts = [],
     llvm_repo = "llvm_mingw_ucrt",
-    llvm_version = VERSION,
-    toolchain_bins = ":compiler_components",
-    toolchain_identifier = "llvm_mingw",
-    toolchain_prefix = "x86_64-w64-mingw32",
+    toolchain_bins = ":toolchain_bins",
 )

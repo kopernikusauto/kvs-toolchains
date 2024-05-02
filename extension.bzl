@@ -43,3 +43,18 @@ def _tricore_gcc_archives_impl(ctx):
 tricore_gcc_archives = module_extension(
     implementation = _tricore_gcc_archives_impl,
 )
+
+def _llvm_mingw_archives_impl(ctx):
+    #token = ctx.getenv("CLOUDSMITH_TOKEN", "XXX")
+    http_archive(
+        name = "llvm_mingw_ucrt",
+        strip_prefix = "llvm-mingw-20240417-ucrt-x86_64",
+        #url = _cloudsmith_url(token, "llvm-mingw-ucrt/versions/18.1.4/llvm-mingw-20240417-ucrt-x86_64.zip"),
+        url = "https://github.com/mstorsjo/llvm-mingw/releases/download/20240417/llvm-mingw-20240417-ucrt-x86_64.zip",
+        integrity = "sha256-r6aaxA8IchZYu9aCa2M/O1RXnXrkyrH2JMxuLv0Fvw4=",
+        build_file = "@kvs_toolchains//toolchain/archives:llvm_mingw_ucrt.BUILD",
+    )
+
+llvm_mingw_archives = module_extension(
+    implementation = _llvm_mingw_archives_impl,
+)

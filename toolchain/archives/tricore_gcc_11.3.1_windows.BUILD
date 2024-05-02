@@ -2,7 +2,7 @@
 This BUILD file is used to provide the content of a tricore_gcc archive
 """
 
-load("@kvs_toolchains//toolchain:config.bzl", "cc_tricore_gcc_toolchain_config")
+load("@kvs_toolchains//toolchain/config:tricore_gcc.bzl", "cc_tricore_gcc_toolchain_config")
 load("@rules_cc//cc:defs.bzl", "cc_toolchain")
 
 package(default_visibility = ["//visibility:public"])

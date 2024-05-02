@@ -3,6 +3,7 @@
 # ------------------------------------------------------------------------------
 
 """
+Tricore GCC (Windows / Linux) toolchain configuration
 """
 
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
@@ -32,7 +33,7 @@ def _action_configs(ctx, action_names, tool_name, implies = []):
     ]
 
 def _default_compiler_flags(ctx):
-    """Default compiler flags for GCC bazel toolchains"""
+    """Default compiler flags for non-msvc toolchains"""
     compiler_flags = [
         "-fno-canonical-system-headers",
         "-no-canonical-prefixes",

@@ -60,6 +60,7 @@ _gen_hex = rule(
 )
 
 def aurix_binary(name, **kw):
+    kw["linkopts"].append("-lstdc++")
     cc_binary(
         name = name + ".elf",
         **kw

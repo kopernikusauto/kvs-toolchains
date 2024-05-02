@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "917971170f0942bc645fcdc8a3d8c36cfd00d643f288814c8b9331de8c4b9a71",
+  "moduleFileHash": "ce8524cec3e34ede4a52477f06a5d2bf454f926fed3d3f10052b9aa4c6c301f7",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -18,7 +18,7 @@
   "moduleDepGraph": {
     "<root>": {
       "name": "kvs_toolchains",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "key": "<root>",
       "repoName": "kvs_toolchains",
       "executionPlatformsToRegister": [],
@@ -36,6 +36,23 @@
           "imports": {
             "tricore_gcc_linux_x86_64": "tricore_gcc_linux_x86_64",
             "tricore_gcc_windows_x86_64": "tricore_gcc_windows_x86_64"
+          },
+          "devImports": [],
+          "tags": [],
+          "hasDevUseExtension": false,
+          "hasNonDevUseExtension": true
+        },
+        {
+          "extensionBzlFile": "@kvs_toolchains//:extension.bzl",
+          "extensionName": "llvm_mingw_archives",
+          "usingModule": "<root>",
+          "location": {
+            "file": "@@//:MODULE.bazel",
+            "line": 18,
+            "column": 36
+          },
+          "imports": {
+            "llvm_mingw_ucrt": "llvm_mingw_ucrt"
           },
           "devImports": [],
           "tags": [],

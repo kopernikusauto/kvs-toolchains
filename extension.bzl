@@ -13,7 +13,7 @@ def _cloudsmith_url(token, leaf):
     """
     return "https://dl.cloudsmith.io/{}/kopernikusauto/kvs/raw/names/{}".format(token, leaf)
 
-def _tricore_gcc_archives_impl(ctx):
+def _kvs_toolchain_archives_impl(ctx):
     token = ctx.getenv("CLOUDSMITH_TOKEN", "XXX")
     http_archive(
         name = "tricore_gcc_linux_x86_64",
@@ -40,12 +40,6 @@ def _tricore_gcc_archives_impl(ctx):
         build_file = "@kvs_toolchains//toolchain/archives:aurix_flasher.BUILD",
     )
 
-tricore_gcc_archives = module_extension(
-    implementation = _tricore_gcc_archives_impl,
-)
-
-def _llvm_mingw_archives_impl(ctx):
-    #token = ctx.getenv("CLOUDSMITH_TOKEN", "XXX")
     http_archive(
         name = "llvm_mingw_ucrt",
         strip_prefix = "llvm-mingw-20240417-ucrt-x86_64",
@@ -55,6 +49,6 @@ def _llvm_mingw_archives_impl(ctx):
         build_file = "@kvs_toolchains//toolchain/archives:llvm_mingw_ucrt.BUILD",
     )
 
-llvm_mingw_archives = module_extension(
-    implementation = _llvm_mingw_archives_impl,
+kvs_toolchain_archives = module_extension(
+    implementation = _kvs_toolchain_archives_impl,
 )

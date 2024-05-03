@@ -98,7 +98,6 @@ def _llvm_mingw_impl(ctx):
                         "-Wno-error=deprecated",
                         "-fdiagnostics-color=auto",
                     ]),
-                    flag_group(flags = ["-isystem {}".format(include.path) for include in ctx.files.include_path]),
                 ],
             ),
             flag_set(
@@ -150,6 +149,7 @@ def _llvm_mingw_impl(ctx):
         tool_paths = tool_paths,
         target_cpu = "x86_64",
         target_libc = "unknown",
+        cxx_builtin_include_directories = [include.path for include in ctx.files.include_path],
         features = [
             toolchain_compiler_flags,
             toolchain_linker_flags,

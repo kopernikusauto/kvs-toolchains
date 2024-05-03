@@ -4,16 +4,14 @@ Toolchains and platform definitions for KVS
 
 module(
     name = "kvs_toolchains",
-    version = "1.0.4",
+    version = "1.0.5",
     compatibility_level = 1,
 )
 
 bazel_dep(name = "platforms", version = "0.0.9")
 bazel_dep(name = "rules_cc", version = "0.0.9")
 
-tricore_gcc_archives = use_extension("@kvs_toolchains//:extension.bzl", "tricore_gcc_archives")
-use_repo(tricore_gcc_archives, "tricore_gcc_linux_x86_64")
-use_repo(tricore_gcc_archives, "tricore_gcc_windows_x86_64")
-
-llvm_mingw_archives = use_extension("@kvs_toolchains//:extension.bzl", "llvm_mingw_archives")
-use_repo(llvm_mingw_archives, "llvm_mingw_ucrt")
+kvs_toolchain_archives = use_extension("@kvs_toolchains//:extension.bzl", "kvs_toolchain_archives")
+use_repo(kvs_toolchain_archives, "tricore_gcc_linux_x86_64")
+use_repo(kvs_toolchain_archives, "tricore_gcc_windows_x86_64")
+use_repo(kvs_toolchain_archives, "llvm_mingw_ucrt")

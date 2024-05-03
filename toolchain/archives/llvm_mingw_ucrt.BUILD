@@ -1,5 +1,5 @@
 """
-This BUILD file is used to provide the content of a tricore_gcc archive
+This BUILD file is used to provide the content of a llvm_mingw archive
 """
 
 load("@kvs_toolchains//toolchain/config:llvm_mingw.bzl", "cc_llvm_mingw_toolchain_config")

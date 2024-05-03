@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "75a789e44c436d3bb64cdd08d27b6045507f4ff0237edba753b7091de928898e",
+  "moduleFileHash": "658a4950dcb4c8d2d1f28de0f713e68d0a7a242d59088223f002069e64ecd1cf",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -18,7 +18,7 @@
   "moduleDepGraph": {
     "<root>": {
       "name": "kvs_toolchains",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "key": "<root>",
       "repoName": "kvs_toolchains",
       "executionPlatformsToRegister": [],
@@ -26,33 +26,18 @@
       "extensionUsages": [
         {
           "extensionBzlFile": "@kvs_toolchains//:extension.bzl",
-          "extensionName": "tricore_gcc_archives",
+          "extensionName": "kvs_toolchain_archives",
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
             "line": 14,
-            "column": 37
+            "column": 39
           },
           "imports": {
             "tricore_gcc_linux_x86_64": "tricore_gcc_linux_x86_64",
-            "tricore_gcc_windows_x86_64": "tricore_gcc_windows_x86_64"
-          },
-          "devImports": [],
-          "tags": [],
-          "hasDevUseExtension": false,
-          "hasNonDevUseExtension": true
-        },
-        {
-          "extensionBzlFile": "@kvs_toolchains//:extension.bzl",
-          "extensionName": "llvm_mingw_archives",
-          "usingModule": "<root>",
-          "location": {
-            "file": "@@//:MODULE.bazel",
-            "line": 18,
-            "column": 36
-          },
-          "imports": {
-            "llvm_mingw_ucrt": "llvm_mingw_ucrt"
+            "tricore_gcc_windows_x86_64": "tricore_gcc_windows_x86_64",
+            "llvm_mingw_ucrt": "llvm_mingw_ucrt",
+            "gcc_linux_x86_64": "gcc_linux_x86_64"
           },
           "devImports": [],
           "tags": [],
@@ -1089,5 +1074,73 @@
       }
     }
   },
-  "moduleExtensions": {}
+  "moduleExtensions": {
+    "//:extension.bzl%kvs_toolchain_archives": {
+      "general": {
+        "bzlTransitiveDigest": "0HlCU5HqvEMqW3R6tXPmMyMqakob8UTJ8XEvVgkAAhA=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "llvm_mingw_ucrt": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "strip_prefix": "llvm-mingw-20240417-ucrt-x86_64",
+              "url": "https://github.com/kopernikusauto/kvs-toolchains/releases/download/2024.01.25/llvm-mingw-20240417-ucrt-x86_64.zip",
+              "integrity": "sha256-r6aaxA8IchZYu9aCa2M/O1RXnXrkyrH2JMxuLv0Fvw4=",
+              "build_file": "@@//toolchain/archives:llvm_mingw_ucrt.BUILD"
+            }
+          },
+          "tricore_gcc_windows_x86_64": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "strip_prefix": "tricore-gcc",
+              "url": "https://dl.cloudsmith.io/XXX/kopernikusauto/kvs/raw/names/tricore-gcc_windows-x86_64/versions/11.3.1/tricore-elf-gcc-11.3.1-windows.tar.xz",
+              "sha256": "ce11520e9ad0caebaab74f5bf85dbcd524c7203df8c319df249610809f9b4f83",
+              "build_file": "@@//toolchain/archives:tricore_gcc_11.3.1_windows.BUILD"
+            }
+          },
+          "tricore_gcc_linux_x86_64": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "strip_prefix": "tricore-elf",
+              "url": "https://github.com/kopernikusauto/kvs-toolchains/releases/download/2024.01.25/tricore-elf-gcc-11.3.1.tar.xz",
+              "sha256": "de02d8befcbac36f3bc9f1b06ec0e2059b3b2d6411b2259152cac05eb5d4267c",
+              "build_file": "@@//toolchain/archives:tricore_gcc_11.3.1.BUILD"
+            }
+          },
+          "gcc_linux_x86_64": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "strip_prefix": "x86-64--glibc--bleeding-edge-2024.02-1",
+              "url": "https://github.com/kopernikusauto/kvs-toolchains/releases/download/2024.01.25/x86-64--glibc--bleeding-edge-2024.02-1.tar.bz2",
+              "sha256": "7aac949737ebfb3f4bccc6a75af79d50cf1fadd9ffbdf21e26c1508dff67f23d",
+              "build_file": "@@//toolchain/archives:gcc_linux_x86_64_13.2.0.BUILD"
+            }
+          },
+          "aurix_flasher": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "strip_prefix": "aurix-flasher",
+              "url": "https://dl.cloudsmith.io/XXX/kopernikusauto/kvs/raw/names/aurix-flasher/versions/1.0.8.0/aurix-flasher-1.0.8.0.tar.xz",
+              "sha256": "ef265195e1323bf6f6f05893c7264faedf9d7ad2544b512f64a3d12c7112f1f2",
+              "build_file": "@@//toolchain/archives:aurix_flasher.BUILD"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    }
+  }
 }

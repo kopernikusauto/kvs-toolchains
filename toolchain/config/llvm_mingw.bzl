@@ -130,7 +130,6 @@ def _llvm_mingw_impl(ctx):
                     flag_group(
                         flags = [
                             "-no-canonical-prefixes",
-                            "-stdlib=libc++",
                             "-static",
                             "-lc++",
                         ],

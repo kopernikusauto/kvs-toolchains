@@ -15,8 +15,6 @@ exports_files(glob(
 
 PREFIX = "x86_64-centos7-linux-gnu"
 
-VERSION = "13.2.0"
-
 [
     filegroup(
         name = tool,
@@ -72,17 +70,17 @@ filegroup(
     srcs = ["bin/yacc"],
 )
 
+# x86_64-centos7-linux-gnu-gcc -E -x c++ - -v
 filegroup(
     name = "include_path",
     srcs = [
-        "lib/gcc/{}/{}/include".format(PREFIX, VERSION),
-        "lib/gcc/{}/{}/include-fixed".format(PREFIX, VERSION),
-        "{}/include".format(PREFIX),
-        "{}/include/c++/{}".format(PREFIX, VERSION),
-        "{}/include/c++/{}/backward".format(PREFIX, VERSION),
-        "{}/include/c++/{}/tr1".format(PREFIX, VERSION),
-        "{}/include/c++/{}/{}".format(PREFIX, VERSION, PREFIX),
-        "{}/sysroot/usr/include".format(PREFIX),
+        "lib/gcc/x86_64-centos7-linux-gnu/13.2.0/include",
+        "lib/gcc/x86_64-centos7-linux-gnu/13.2.0/include-fixed",
+        "x86_64-centos7-linux-gnu/include",
+        "x86_64-centos7-linux-gnu/include/c++/13.2.0",
+        "x86_64-centos7-linux-gnu/include/c++/13.2.0/backward",
+        "x86_64-centos7-linux-gnu/include/c++/13.2.0/x86_64-centos7-linux-gnu",
+        "x86_64-centos7-linux-gnu/sysroot/usr/include",
     ],
 )
 

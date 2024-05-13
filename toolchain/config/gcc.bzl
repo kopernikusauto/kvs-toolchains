@@ -47,7 +47,7 @@ def _gcc_impl(ctx):
     tool_paths = [
         tool_path(
             name = "gcc",
-            path = "bin/{}-g++".format(PREFIX),
+            path = "bin/{}-gcc".format(PREFIX),
         ),
         tool_path(
             name = "g++",
@@ -111,9 +111,9 @@ def _gcc_impl(ctx):
         ),
     ]
 
-    # system_include_directories = []
-    # for inc in ctx.files.include_path:
-    #     system_include_directories += ["-isystem", inc.path]
+    system_include_directories = []
+    for inc in ctx.files.include_path:
+        system_include_directories += ["-isystem", inc.path]
 
     toolchain_compiler_flags = feature(
         name = "compiler_flags",
@@ -124,7 +124,7 @@ def _gcc_impl(ctx):
                     ACTION_NAMES.c_compile,
                 ],
                 flag_groups = [
-                    flag_group(flags = ["-xc", "-std=c17"]),
+                    flag_group(flags = ["-xc", "-std=c17", "-D_POSIX_C_SOURCE=200809L"]),
                 ],
             ),
             flag_set(
@@ -133,6 +133,7 @@ def _gcc_impl(ctx):
                     flag_group(flags = [
                         "-xc++",
                         "-std=c++20",
+                        "-nostdinc++",
                     ]),
                 ],
             ),
@@ -140,6 +141,7 @@ def _gcc_impl(ctx):
                 actions = all_compile_actions,
                 flag_groups = [
                     flag_group(flags = [
+                        "-pthread",
                         "-fno-canonical-system-headers",
                         "-no-canonical-prefixes",
                         "-Wall",
@@ -147,9 +149,10 @@ def _gcc_impl(ctx):
                         "-Wpedantic",
                         "-Wno-error=deprecated",
                         "-fdiagnostics-color=auto",
-                        #"-nostdinc",
+                        "-nostdinc",
+                        "-D_POSIX_SOURCE",
                     ]),
-                    #flag_group(flags = system_include_directories),
+                    flag_group(flags = system_include_directories),
                 ],
             ),
         ],
@@ -164,13 +167,20 @@ def _gcc_impl(ctx):
                 flag_groups = ([
                     flag_group(
                         flags = [
+                            "-fuse-ld=gold",
+                            "-pthread",
                             "-no-canonical-prefixes",
-                            #"-static",
+                            "-static-libstdc++",
+                            "-static-libgcc",
                             "-l:libstdc++.a",
+                            "-l:libstdc++exp.a",
+                            "-l:libstdc++fs.a",
+                            "-lc-2.17",
+                            "-lm-2.17",
+                            "-lrt-2.17",
                         ],
                     ),
                     flag_group(flags = ["-L{}".format(lib.path) for lib in ctx.files.library_path]),
-                    flag_group(flags = ["-fuse-ld=gold"]),
                 ]),
             ),
         ],

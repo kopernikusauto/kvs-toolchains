@@ -7,117 +7,120 @@ Tricore GCC (Windows / Linux) toolchain configuration
 """
 
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
-load("@rules_cc//cc:cc_toolchain_config_lib.bzl", "action_config", "feature", "flag_group", "flag_set")
+load(
+    "@rules_cc//cc:cc_toolchain_config_lib.bzl",
+    "action_config",
+    "feature",
+    "flag_group",
+    "flag_set",
+    "tool",
+    "tool_path",
+)
 
-def _tool_path(bins, toolchain_prefix, tool_name):
-    """Generate tool paths"""
-    for file in bins:
-        if file.basename.startswith("{}-{}".format(toolchain_prefix, tool_name)):
-            return file
-    return None
+all_compile_actions = [
+    ACTION_NAMES.assemble,
+    ACTION_NAMES.preprocess_assemble,
+    ACTION_NAMES.linkstamp_compile,
+    ACTION_NAMES.c_compile,
+    ACTION_NAMES.cpp_compile,
+    ACTION_NAMES.cpp_header_parsing,
+    ACTION_NAMES.cpp_module_compile,
+    ACTION_NAMES.cpp_module_codegen,
+    ACTION_NAMES.lto_backend,
+    ACTION_NAMES.clif_match,
+]
 
-def _action_configs(ctx, action_names, tool_name, implies = []):
-    """Generate action configs"""
-    return [
-        action_config(
-            action_name = action_name,
-            tools = [
-                struct(
-                    type_name = "tool",
-                    tool = _tool_path(ctx.files.toolchain_bins, ctx.attr.toolchain_prefix, tool_name),
-                ),
-            ],
-            implies = implies,
-        )
-        for action_name in action_names
-    ]
+cpp_compile_actions = [
+    ACTION_NAMES.cpp_compile,
+    ACTION_NAMES.cpp_header_parsing,
+    ACTION_NAMES.cpp_module_compile,
+    ACTION_NAMES.cpp_module_codegen,
+]
 
-def _default_compiler_flags(ctx):
-    """Default compiler flags for non-msvc toolchains"""
-    compiler_flags = [
-        "-fno-canonical-system-headers",
-        "-no-canonical-prefixes",
-        "-Wall",
-        "-Wextra",
-        "-Wpedantic",
-        "-Wno-error=deprecated",
-        "-fdiagnostics-color=auto",
-    ]
+all_link_actions = [
+    ACTION_NAMES.cpp_link_executable,
+    ACTION_NAMES.cpp_link_dynamic_library,
+    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+]
 
-    if not ctx.attr.include_std:
-        compiler_flags.append("-nostdinc")
-
-    return compiler_flags
-
-def _default_tricore_compiler_flags(ctx):
-    """Default compiler flags for GCC bazel toolchains"""
-    compiler_flags = [
-        "-fmessage-length=0",
-        "-fno-common",
-        "-fstrict-volatile-bitfields",
-        "-fdata-sections",
-        "-ffunction-sections",
-        "-fno-eliminate-unused-debug-symbols",
-        "-mtc162",  # TODO: We need to generalize this if we want to support more than the tc377tx!
-    ]
-
-    return _default_compiler_flags(ctx) + compiler_flags
-
-def _default_tricore_linker_flags(_ctx):
-    """Default linker flags for GCC bazel toolchains"""
-    linker_flags = [
-        "-no-canonical-prefixes",
-        "-Wl,--gc-sections",
-        "-mtc162",  # TODO: We need to generalize this if we want to support more than the tc377tx!
-    ]
-
-    return linker_flags
+PREFIX = "tricore-elf"
 
 def _tricore_gcc_impl(ctx):
-    default_compiler_flags = _default_tricore_compiler_flags(ctx)
-    default_linker_flags = _default_tricore_linker_flags(ctx)
-    action_configs = []
+    tool_paths = [
+        tool_path(
+            name = "gcc",
+            path = "bin/{}-gcc".format(PREFIX),
+        ),
+        tool_path(
+            name = "g++",
+            path = "bin/{}-g++".format(PREFIX),
+        ),
+        tool_path(
+            name = "ld",
+            path = "bin/{}-ld".format(PREFIX),
+        ),
+        tool_path(
+            name = "ar",
+            path = "bin/{}-ar".format(PREFIX),
+        ),
+        tool_path(
+            name = "as",
+            path = "bin/{}-as".format(PREFIX),
+        ),
+        tool_path(
+            name = "elfedit",
+            path = "bin/{}-elfedit".format(PREFIX),
+        ),
+        tool_path(
+            name = "cpp",
+            path = "bin/{}-cpp".format(PREFIX),
+        ),
+        tool_path(
+            name = "gcov",
+            path = "bin/{}-gcov".format(PREFIX),
+        ),
+        tool_path(
+            name = "gcov-dump",
+            path = "bin/{}-gcov-dump".format(PREFIX),
+        ),
+        tool_path(
+            name = "gcov-tool",
+            path = "bin/{}-gcov-tool".format(PREFIX),
+        ),
+        tool_path(
+            name = "nm",
+            path = "bin/{}-nm".format(PREFIX),
+        ),
+        tool_path(
+            name = "objdump",
+            path = "bin/{}-objdump".format(PREFIX),
+        ),
+        tool_path(
+            name = "objcopy",
+            path = "bin/{}-objcopy".format(PREFIX),
+        ),
+        tool_path(
+            name = "strip",
+            path = "bin/{}-strip".format(PREFIX),
+        ),
+        tool_path(
+            name = "size",
+            path = "bin/{}-size".format(PREFIX),
+        ),
+        tool_path(
+            name = "readelf",
+            path = "bin/{}-readelf".format(PREFIX),
+        ),
+        tool_path(
+            name = "gprof",
+            path = "bin/{}-gprof".format(PREFIX),
+        ),
+    ]
 
-    action_configs += _action_configs(
-        ctx,
-        [
-            ACTION_NAMES.assemble,
-            ACTION_NAMES.preprocess_assemble,
-            ACTION_NAMES.c_compile,
-            ACTION_NAMES.cc_flags_make_variable,
-            ACTION_NAMES.cpp_link_executable,
-            ACTION_NAMES.cpp_link_dynamic_library,
-            ACTION_NAMES.cpp_link_nodeps_dynamic_library,
-            ACTION_NAMES.cpp_compile,
-            ACTION_NAMES.cpp_header_parsing,
-        ],
-        ctx.attr.gcc_tool,
-    )
-
-    action_configs += _action_configs(
-        ctx,
-        [ACTION_NAMES.cpp_link_static_library],
-        "ar",
-        implies = ["archiver_flags", "linker_param_file"],
-    )
-
-    action_configs += _action_configs(
-        ctx,
-        [ACTION_NAMES.llvm_cov],
-        "gcov",
-    )
-
-    action_configs += _action_configs(
-        ctx,
-        [ACTION_NAMES.strip],
-        "strip",
-    )
-
-    action_configs += _action_configs(
-        ctx,
-        [ACTION_NAMES.objcopy_embed_data],
-        "objcopy",
-    )
+    # Why was this not working?
+    # system_include_directories = []
+    # for inc in ctx.files.include_path:
+    #     system_include_directories += ["-isystem", inc.path]
 
     toolchain_compiler_flags = feature(
         name = "compiler_flags",
@@ -125,110 +128,103 @@ def _tricore_gcc_impl(ctx):
         flag_sets = [
             flag_set(
                 actions = [
-                    ACTION_NAMES.assemble,
-                    ACTION_NAMES.preprocess_assemble,
-                    ACTION_NAMES.linkstamp_compile,
-                    ACTION_NAMES.c_compile,
-                    ACTION_NAMES.cpp_compile,
-                    ACTION_NAMES.cpp_header_parsing,
-                    ACTION_NAMES.cpp_module_compile,
-                    ACTION_NAMES.cpp_module_codegen,
-                    ACTION_NAMES.lto_backend,
-                    ACTION_NAMES.clif_match,
-                ],
-                flag_groups = [
-                    #flag_group(flags = ["-isystem={}".format(include.path) for include in ctx.files.include_path]),
-                    flag_group(flags = ctx.attr.copts + default_compiler_flags),
-                ],
-            ),
-            flag_set(
-                actions = [
                     ACTION_NAMES.c_compile,
                 ],
                 flag_groups = [
-                    flag_group(flags = ["-std=c17"]),
+                    flag_group(flags = ["-xc", "-std=c17"]),
                 ],
             ),
             flag_set(
-                actions = [
-                    ACTION_NAMES.cpp_compile,
-                    ACTION_NAMES.cpp_header_parsing,
-                    ACTION_NAMES.cpp_module_compile,
-                    ACTION_NAMES.cpp_module_codegen,
-                ],
+                actions = cpp_compile_actions,
                 flag_groups = [
                     flag_group(flags = [
+                        "-xc++",
                         "-std=c++20",
-                        "-Wno-register",
-                        "-Wno-deprecated-enum-enum-conversion",
-                        "-fno-rtti",
                     ]),
+                ],
+            ),
+            flag_set(
+                actions = all_compile_actions,
+                flag_groups = [
+                    flag_group(flags = [
+                        "-fno-canonical-system-headers",
+                        "-no-canonical-prefixes",
+                        "-Wall",
+                        "-Wextra",
+                        "-Wpedantic",
+                        "-Wno-error=deprecated",
+                        "-fdiagnostics-color=auto",
+                        "-fmessage-length=0",
+                        "-fno-common",
+                        "-fstrict-volatile-bitfields",
+                        "-fdata-sections",
+                        "-ffunction-sections",
+                        "-fno-eliminate-unused-debug-symbols",
+                        "-mtc162",  # TODO: We need to generalize this if we want to support more than the tc377tx!
+                        "-D__AURIX__",
+                    ]),
+                    #flag_group(flags = system_include_directories),
                 ],
             ),
         ],
     )
 
     toolchain_linker_flags = feature(
-        name = "linker_flags",
+        name = "default_linker_flags",
         enabled = True,
         flag_sets = [
             flag_set(
-                actions = [ACTION_NAMES.linkstamp_compile],
-                flag_groups = [
-                    flag_group(flags = ["-L" + library.path for library in ctx.files.library_path]),
-                ],
+                actions = all_link_actions,
+                flag_groups = ([
+                    flag_group(
+                        flags = [
+                            "-no-canonical-prefixes",
+                            "-Wl,--gc-sections",
+                            "-mtc162",  # TODO: We need to generalize this if we want to support more than the tc377tx!
+                            "-lstdc++",
+                        ],
+                    ),
+                    flag_group(flags = ["-L{}".format(lib.path) for lib in ctx.files.library_path]),
+                ]),
             ),
         ],
     )
 
-    custom_linkopts = feature(
-        name = "custom_linkopts",
-        enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.cpp_link_executable],
-                flag_groups = [
-                    flag_group(flags = ctx.attr.linkopts + default_linker_flags),
-                ],
+    objcopy_action = action_config(
+        action_name = ACTION_NAMES.objcopy_embed_data,
+        tools = [
+            tool(
+                path = "bin/{}-objcopy".format(PREFIX),
             ),
         ],
     )
 
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
-        toolchain_identifier = ctx.attr.toolchain_identifier,
-        host_system_name = ctx.attr.host_system_name,
-        target_system_name = ctx.attr.toolchain_prefix,
-        target_cpu = ctx.attr.toolchain_prefix,
-        target_libc = "gcc",
-        compiler = ctx.attr.gcc_repo,
-        abi_version = ctx.attr.abi_version,
-        abi_libc_version = ctx.attr.gcc_version,
-        action_configs = action_configs,
+        toolchain_identifier = "tricore_gcc",
+        target_system_name = PREFIX,
+        compiler = "gcc",
+        tool_paths = tool_paths,
+        target_cpu = "tricore-elf",
+        target_libc = "unknown",
         cxx_builtin_include_directories = [include.path for include in ctx.files.include_path],
+        action_configs = [
+            objcopy_action,
+        ],
         features = [
             toolchain_compiler_flags,
             toolchain_linker_flags,
-            custom_linkopts,
         ],
+        builtin_sysroot = ctx.file.sysroot.path,
     )
 
 cc_tricore_gcc_toolchain_config = rule(
     implementation = _tricore_gcc_impl,
     attrs = {
-        "toolchain_identifier": attr.string(default = "tricore_gcc"),
-        "toolchain_prefix": attr.string(default = "tricore-elf"),
-        "host_system_name": attr.string(default = ""),
         "toolchain_bins": attr.label(mandatory = True, allow_files = True),
-        "gcc_repo": attr.string(default = ""),
-        "gcc_version": attr.string(default = "11.3.1"),
-        "gcc_tool": attr.string(default = "gcc"),
-        "abi_version": attr.string(default = ""),
-        "copts": attr.string_list(default = []),
-        "linkopts": attr.string_list(default = []),
         "include_path": attr.label_list(default = [], allow_files = True),
         "library_path": attr.label_list(default = [], allow_files = True),
-        "include_std": attr.bool(default = False),
+        "sysroot": attr.label(mandatory = False, default = None, allow_single_file = True),
     },
     provides = [CcToolchainConfigInfo],
 )

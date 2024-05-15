@@ -15,8 +15,6 @@ exports_files(glob(
 
 PREFIX = "tricore-elf"
 
-VERSION = "11.3.1"
-
 TOOLS = [
     "as",
     "ar",
@@ -49,11 +47,12 @@ TOOLS = [
 filegroup(
     name = "include_path",
     srcs = [
-        "lib/gcc/{}/{}/include".format(PREFIX, VERSION),
-        "lib/gcc/{}/{}/include-fixed".format(PREFIX, VERSION),
-        "{}/include".format(PREFIX),
-        "{}/include/c++/{}".format(PREFIX, VERSION),
-        "{}/include/c++/{}/{}".format(PREFIX, VERSION, PREFIX),
+        "lib/gcc/tricore-elf/11.3.1/include",
+        "lib/gcc/tricore-elf/11.3.1/include-fixed",
+        "tricore-elf/include",
+        "tricore-elf/include/c++/11.3.1",
+        "tricore-elf/include/c++/11.3.1/tr1",
+        "tricore-elf/include/c++/11.3.1/tricore-elf",
     ],
 )
 
@@ -83,28 +82,6 @@ filegroup(
     ]),
 )
 
-# files for executing compiler.
-filegroup(
-    name = "compiler_files",
-    srcs = [":compiler_pieces"],
-)
-
-filegroup(
-    name = "ar_files",
-    srcs = [":compiler_pieces"],
-)
-
-filegroup(
-    name = "linker_files",
-    srcs = [":compiler_pieces"],
-)
-
-# collection of executables.
-filegroup(
-    name = "compiler_components",
-    srcs = [":compiler_pieces"],
-)
-
 cc_toolchain(
     name = "cc_toolchain",
     all_files = ":all",
@@ -121,17 +98,8 @@ cc_toolchain(
 
 cc_tricore_gcc_toolchain_config(
     name = "cc_toolchain_config",
-    abi_version = "",
-    copts = [],
-    gcc_repo = "tricore_gcc_linux_x86_64",
-    gcc_tool = "gcc",
-    gcc_version = "11.3.1",
-    host_system_name = "linux_x86_64",
     include_path = [":include_path"],
-    include_std = True,
     library_path = [":library_path"],
-    linkopts = [],
-    toolchain_bins = ":compiler_components",
-    toolchain_identifier = "tricore_gcc",
-    toolchain_prefix = "tricore-elf",
+    sysroot = "{}".format(PREFIX),
+    toolchain_bins = ":toolchain_bins",
 )

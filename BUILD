@@ -57,3 +57,15 @@ toolchain(
     toolchain = "@gcc_linux_x86_64//:cc_toolchain",
     toolchain_type = "@rules_cc//cc:toolchain_type",
 )
+
+alias(
+    name = "aurix_flasher",
+    actual = "@aurix_flasher//:AurixFlasher.exe",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "aurix_flasher_deps",
+    actual = "@aurix_flasher//:all",
+    visibility = ["//visibility:public"],
+)

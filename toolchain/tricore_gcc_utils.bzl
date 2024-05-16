@@ -24,7 +24,7 @@ def _gen_hex_impl(ctx):
     )
 
     elf_src = ctx.file.elf
-    output_file = ctx.actions.declare_file(ctx.label.name + ".hex")
+    output_file = ctx.actions.declare_file(ctx.label.name)
 
     args = ctx.actions.args()
     args.add("-O")
@@ -46,7 +46,7 @@ def _gen_hex_impl(ctx):
     )
 
     return [
-        DefaultInfo(files = depset([output_file, elf_src])),
+        DefaultInfo(files = depset([output_file])),
     ]
 
 _gen_hex = rule(
@@ -59,13 +59,59 @@ _gen_hex = rule(
     toolchains = use_cpp_toolchain(),
 )
 
+def _flash_aurix_impl(ctx):
+    elf_src = ctx.file.elf
+    hex_src = ctx.file.hex
+    output_file = ctx.actions.declare_file("{}.log.xml".format(ctx.attr.name))
+
+    args = ctx.actions.args()
+    args.add("-elf")
+    args.add(elf_src)
+    args.add("-hex")
+    args.add(hex_src)
+    args.add("-log")
+    args.add(output_file)
+
+    ctx.actions.run(
+        mnemonic = "AurixFlasher",
+        executable = ctx.file.flasher,
+        arguments = [args],
+        inputs = depset(
+            direct = [elf_src, hex_src],
+        ),
+        outputs = [output_file],
+    )
+
+    return [
+        DefaultInfo(files = depset([output_file])),
+    ]
+
+flash_aurix = rule(
+    implementation = _flash_aurix_impl,
+    attrs = dict(
+        flasher = attr.label(allow_single_file = True),
+        elf = attr.label(allow_single_file = True),
+        hex = attr.label(allow_single_file = True),
+    ),
+)
+
 def aurix_binary(name, **kw):
-    kw["linkopts"].append("-lstdc++")
     cc_binary(
         name = name + ".elf",
+        target_compatible_with = ["@kvs_toolchains//platform/cpu:tricore"],
         **kw
     )
     _gen_hex(
-        name = name,
+        name = name + ".hex",
+        elf = ":{}".format(name),
+    )
+    native.alias(name = name, actual = name + ".elf")
+
+    flash_aurix(
+        name = "{}.flash".format(name),
         elf = ":{}.elf".format(name),
+        hex = ":{}.hex".format(name),
+        flasher = "@kvs_toolchains//:aurix_flasher",
+        exec_compatible_with = ["@platforms//os:windows"],
+        visibility = ["//visibility:public"],
     )

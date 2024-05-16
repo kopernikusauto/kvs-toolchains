@@ -12,6 +12,7 @@ bazel_dep(name = "platforms", version = "0.0.9")
 bazel_dep(name = "rules_cc", version = "0.0.9")
 
 kvs_toolchain_archives = use_extension("@kvs_toolchains//:extension.bzl", "kvs_toolchain_archives")
+use_repo(kvs_toolchain_archives, "aurix_flasher")
 use_repo(kvs_toolchain_archives, "tricore_gcc_linux_x86_64")
 use_repo(kvs_toolchain_archives, "tricore_gcc_windows_x86_64")
 use_repo(kvs_toolchain_archives, "llvm_mingw_ucrt")

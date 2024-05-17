@@ -3,6 +3,8 @@ Our top level toolchains are defined and provided here.
 Use them in your module with the `register_toolchain` function.
 """
 
+load("@rules_python//python:defs.bzl", "py_library")
+
 toolchain(
     name = "tricore_gcc_linux",
     exec_compatible_with = [
@@ -15,6 +17,7 @@ toolchain(
     ],
     toolchain = "@tricore_gcc_linux_x86_64//:cc_toolchain",
     toolchain_type = "@rules_cc//cc:toolchain_type",
+    visibility = ["//visibility:public"],
 )
 
 toolchain(
@@ -29,7 +32,17 @@ toolchain(
     ],
     toolchain = "@tricore_gcc_windows_x86_64//:cc_toolchain",
     toolchain_type = "@rules_cc//cc:toolchain_type",
+    visibility = ["//visibility:public"],
 )
+
+# alias(
+#     name = "current_tricore_toolchain",
+#     actual = select({
+#         "@platforms//os:linux": "@tricore_gcc_linux_x86_64//:cc_toolchain",
+#         "@platforms//os:windows": "@tricore_gcc_windows_x86_64//:cc_toolchain",
+#     }),
+#     visibility = ["//visibility:public"],
+# )
 
 toolchain(
     name = "llvm_mingw_ucrt",
@@ -42,6 +55,7 @@ toolchain(
     ],
     toolchain = "@llvm_mingw_ucrt//:cc_toolchain",
     toolchain_type = "@rules_cc//cc:toolchain_type",
+    visibility = ["//visibility:public"],
 )
 
 toolchain(
@@ -56,16 +70,16 @@ toolchain(
     ],
     toolchain = "@gcc_linux_x86_64//:cc_toolchain",
     toolchain_type = "@rules_cc//cc:toolchain_type",
+    visibility = ["//visibility:public"],
 )
 
-alias(
+py_library(
     name = "aurix_flasher",
-    actual = "@aurix_flasher//:AurixFlasher.exe",
+    srcs = ["aurix_flasher.py"],
+    data = [
+        "@aurix_flasher//:AurixFlasher.exe",
+        "@aurix_flasher//:all",
+    ],
     visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "aurix_flasher_deps",
-    actual = "@aurix_flasher//:all",
-    visibility = ["//visibility:public"],
+    deps = ["@rules_python//python/runfiles"],
 )

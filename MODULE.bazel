@@ -4,12 +4,13 @@ Toolchains and platform definitions for KVS
 
 module(
     name = "kvs_toolchains",
-    version = "1.1.1",
+    version = "1.1.2",
     compatibility_level = 1,
 )
 
 bazel_dep(name = "platforms", version = "0.0.9")
 bazel_dep(name = "rules_cc", version = "0.0.9")
+bazel_dep(name = "rules_python", version = "0.31.0")
 
 kvs_toolchain_archives = use_extension("@kvs_toolchains//:extension.bzl", "kvs_toolchain_archives")
 use_repo(kvs_toolchain_archives, "aurix_flasher")

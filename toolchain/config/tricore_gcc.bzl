@@ -190,6 +190,21 @@ def _tricore_gcc_impl(ctx):
         ],
     )
 
+    supports_dynamic_linker_feature = feature(name = "supports_dynamic_linker", enabled = False)
+
+    objcopy_embed_flags_feature = feature(
+        name = "objcopy_embed_flags",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = ["objcopy_embed_data"],
+                flag_groups = [
+                    #flag_group(flags = ["-I", "binary"]),
+                ],
+            ),
+        ],
+    )
+
     objcopy_action = action_config(
         action_name = ACTION_NAMES.objcopy_embed_data,
         tools = [
@@ -198,6 +213,18 @@ def _tricore_gcc_impl(ctx):
             ),
         ],
     )
+
+    action_configs = [objcopy_action]
+    gcc = tool(path = "bin/{}-gcc".format(PREFIX))
+    for action_name in all_compile_actions + all_link_actions:
+        action_configs.append(
+            action_config(
+                action_name = action_name,
+                tools = [
+                    gcc,
+                ],
+            ),
+        )
 
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
@@ -208,12 +235,12 @@ def _tricore_gcc_impl(ctx):
         target_cpu = "tricore-elf",
         target_libc = "unknown",
         cxx_builtin_include_directories = [include.path for include in ctx.files.include_path],
-        action_configs = [
-            objcopy_action,
-        ],
+        action_configs = action_configs,
         features = [
             toolchain_compiler_flags,
             toolchain_linker_flags,
+            supports_dynamic_linker_feature,
+            objcopy_embed_flags_feature,
         ],
         builtin_sysroot = ctx.file.sysroot.path,
     )

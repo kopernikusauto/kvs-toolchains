@@ -1,8 +1,0 @@
-package(
-    default_visibility = ["//visibility:public"],
-)
-
-constraint_value(
-    name = "tricore",
-    constraint_setting = "@platforms//cpu",
-)

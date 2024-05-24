@@ -36,19 +36,8 @@ class TricoreGccToolchain(ConanFile):
         url, sha = ARCHIVES[str(self.settings.os)]
         get(self, url, sha256=sha)
 
-    def package_id(self):
-        self.info.settings_target = self.settings_target
-        self.info.settings_target.rm_safe("compiler")
-        self.info.settings_target.rm_safe("build_type")
-
     def package(self):
-        toolchain = PREFIX
-        dirs_to_copy = ["bin", "include", "lib", "libexec", "mcs-elf", "share", PREFIX]
-        if self.settings.os == "Windows":
-            dirs_to_copy.append("aurix-flasher")
-        for dir_name in dirs_to_copy:
-            copy(self, pattern=f"{toolchain}/{dir_name}/*", src=self.build_folder, dst=self.package_folder, keep_path=True)
-        copy(self, "LICENSE", src=self.build_folder, dst=os.path.join(self.package_folder, "licenses"), keep_path=False)
+        copy(self, pattern="*", src=self.build_folder, dst=self.package_folder, keep_path=True)
 
     def package_info(self):
         toolchain = PREFIX
@@ -56,8 +45,11 @@ class TricoreGccToolchain(ConanFile):
         if self.settings.os == "Windows":
             self.cpp_info.bindirs.append(os.path.join(self.package_folder, PREFIX, "aurix-flasher"))
 
+        # 'c', 'cpp', 'asm', 'ld', 'ar'
         self.conf_info.define("tools.build:compiler_executables", {
             "c":   f"{toolchain}-gcc",
             "cpp": f"{toolchain}-g++",
+            "ld": f"{toolchain}-ld",
+            "ar": f"{toolchain}-ar",
             "asm": f"{toolchain}-as"
         })

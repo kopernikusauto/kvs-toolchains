@@ -41,15 +41,14 @@ class TricoreGccToolchain(ConanFile):
 
     def package_info(self):
         toolchain = PREFIX
+        _tc_path = os.path.join(self.package_folder, PREFIX, "bin", f"{PREFIX}-")
         self.cpp_info.bindirs.append(os.path.join(self.package_folder, PREFIX, "bin"))
         if self.settings.os == "Windows":
             self.cpp_info.bindirs.append(os.path.join(self.package_folder, PREFIX, "aurix-flasher"))
 
-        # 'c', 'cpp', 'asm', 'ld', 'ar'
-        self.conf_info.define("tools.build:compiler_executables", {
-            "c":   f"{toolchain}-gcc",
-            "cpp": f"{toolchain}-g++",
-            "ld": f"{toolchain}-ld",
-            "ar": f"{toolchain}-ar",
-            "asm": f"{toolchain}-as"
-        })
+        self.buildenv_info.define("TRICORE_GCC_CC", f"{_tc_path}-gcc")
+        self.buildenv_info.define("TRICORE_GCC_CXX", f"{_tc_path}-g++")
+        self.buildenv_info.define("TRICORE_GCC_LD", f"{_tc_path}-ld")
+        self.buildenv_info.define("TRICORE_GCC_AR", f"{_tc_path}-ar")
+        self.buildenv_info.define("TRICORE_GCC_AS", f"{_tc_path}-as")
+

@@ -52,3 +52,9 @@ class TricoreGccToolchain(ConanFile):
         self.buildenv_info.define("TRICORE_GCC_AR", f"{_tc_path}-ar")
         self.buildenv_info.define("TRICORE_GCC_AS", f"{_tc_path}-as")
 
+        # self.conf_info.define("tools.build:compiler_executables", {
+        #     "c":   f"{_tc_path}-gcc",
+        #     "cpp": f"{_tc_path}-g++",
+        #     "asm": f"{_tc_path}-as"
+        # })
+
